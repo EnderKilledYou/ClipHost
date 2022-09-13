@@ -35,13 +35,11 @@ namespace ClipHost
                 var appSettings = appHost.AppSettings;
                 appHost.Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                     new IAuthProvider[] {
-                        new CredentialsAuthProvider(appSettings),     /* Sign In with Username / Password credentials */
-                        new FacebookAuthProvider(appSettings),        /* Create App https://developers.facebook.com/apps */
-                        new GoogleAuthProvider(appSettings),          /* Create App https://console.developers.google.com/apis/credentials */
-                        new MicrosoftGraphAuthProvider(appSettings),  /* Create App https://apps.dev.microsoft.com */
+                        new CredentialsAuthProvider(appSettings),     
+                        
+           
                     }));
-
-                appHost.Plugins.Add(new RegistrationFeature()); //Enable /register Service
+ 
 
                 //override the default registration validation with your own custom implementation
                 appHost.RegisterAs<CustomRegistrationValidator, IValidator<Register>>();
