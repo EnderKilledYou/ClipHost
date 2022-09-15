@@ -1,6 +1,7 @@
 using System;
 using ServiceStack;
 using ClipHost.ServiceModel;
+using ServiceStack.Testing;
 
 namespace ClipHost.ServiceInterface
 {
@@ -14,7 +15,11 @@ namespace ClipHost.ServiceInterface
             ServerEvents = serverEvents;
         }
 
-        
+        public object Any(HelloTest request)
+        {
+            
+            return new HelloTestResponse { Result = $"Hello, {request.Name}!" };
+        }
         public object Any(Hello request)
         {
              

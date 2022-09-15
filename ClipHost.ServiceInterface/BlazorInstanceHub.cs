@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using ClipHost.ServiceModel;
+using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNetCore.SignalR;
 using ServiceStack;
 using ServiceStack.Host;
 using ServiceStack.Testing;
@@ -7,11 +9,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazorQueue.ServiceInterface
 {
-    public class ServiceGatewayHub : Hub
+    public class ServiceGatewayHub : Hub<IBlazorInstanceFacade>
     {
         private readonly MethodInfo mi;
         private readonly MethodInfo pub;
@@ -20,10 +23,11 @@ namespace BlazorQueue.ServiceInterface
         public ServiceGatewayHub()
         {
             mi = typeof(InProcessServiceGateway).GetMethod("SendAllAsync");
-     
+
             puba = typeof(InProcessServiceGateway).GetMethod("PublishAllAsync");
+            
         }
-        
+
         public List<OperationDto> ServiceDiscovery()
         {
             return HostContext.Metadata.GetOperationDtos();
@@ -58,7 +62,7 @@ namespace BlazorQueue.ServiceInterface
 
             return null;
 
-         
+
         }
 
         private IServiceGateway GetServiceGateway()
@@ -68,6 +72,8 @@ namespace BlazorQueue.ServiceInterface
             var serviceGatewayAsync = HostContext.AppHost.GetServiceGateway(request);
             return serviceGatewayAsync;
         }
+
+
 
         public async Task<object> SendAllAsync(object requestDtos)
         {
@@ -83,10 +89,13 @@ namespace BlazorQueue.ServiceInterface
                 var bv = GetServiceGateway();
                 var obj = JsonSerializer.Deserialize(data.Value, requestType);
                 var fooRef = mi.MakeGenericMethod(responseType);
-                var result =   (Task)@fooRef.Invoke(GetServiceGateway(), new object?[] { obj,null });
+                var result = (Task)@fooRef.Invoke(GetServiceGateway(), new object?[] { obj, null });
                 await result.ConfigureAwait(false);
                 //var result = await GetServiceGateway().SendAllAsync((IEnumerable<IReturn<object>>) obj);
                 var resultProperty = result.GetType().GetProperty("Result");
+#if DEBUG
+                await Clients.Caller.PublishAsyncToCaller<HelloTestResponse, HelloTest>(new HelloTest() { });
+#endif 
                 return resultProperty.GetValue(result);
             }
 
@@ -106,13 +115,13 @@ namespace BlazorQueue.ServiceInterface
             {
                 var obj = JsonSerializer.Deserialize(data.Value, requestType);
                 await GetServiceGateway().PublishAsync(obj).ConfigureAwait(false);
-                
+
             }
- 
+
         }
 
         public async Task PublishAllAsync(object requestDtos)
-        
+
         {
             var props = ((JsonElement)requestDtos).EnumerateObject().ToArray();
             var responseTypeJson = props.FirstOrDefault(a => a.Name == "ResponseType");
@@ -124,14 +133,25 @@ namespace BlazorQueue.ServiceInterface
             if (responseType != null && requestType != null)
             {
                 var bv = GetServiceGateway();
-                
+
                 var obj = JsonSerializer.Deserialize(data.Value, requestType);
                 var result = (Task)puba.Invoke(GetServiceGateway(), new object?[] { obj, null });
                 await result.ConfigureAwait(false);
-                
+
             }
 
-   
+
         }
+    }
+    public static class BlazorInstanceHubHelper
+    {
+        public async static Task PublishAsyncToCaller<TResponse, R>(this IBlazorInstanceFacade caller, object requestDto, CancellationToken token = default) where R : IReturn<TResponse>
+        {
+
+            string retfullName = typeof(TResponse).FullName;
+            string typefullname = typeof(R).FullName;
+            await caller.LocalPublishAsync(new { ResponseType = retfullName, Type = typefullname, Data = requestDto });
+        }
+
     }
 }

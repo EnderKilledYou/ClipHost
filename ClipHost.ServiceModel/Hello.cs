@@ -13,4 +13,15 @@ namespace ClipHost.ServiceModel
     {
         public string Result { get; set; }
     }
+    [Route("/test")]
+    [Route("/test/{Name}")]
+    public class HelloTest : IReturn<HelloTestResponse>
+    {
+        public string Name { get; set; }
+    }
+
+    public class HelloTestResponse
+    {
+        public string Result { get; set; }
+    }
 }

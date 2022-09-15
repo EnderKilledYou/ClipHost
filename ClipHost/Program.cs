@@ -1,7 +1,9 @@
 ﻿using BlazorQueue.ServiceInterface;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddJsonProtocol(options => {
+    options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+}); ;
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
