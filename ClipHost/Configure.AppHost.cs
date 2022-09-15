@@ -45,6 +45,7 @@ public class AppHost : AppHostBase, IHostingStartup
         SetConfig(new HostConfig {
             AddRedirectParamsToQueryString = true,
            UseCamelCase=false,
+           
         });
         Plugins.Add(new ValidationFeature());
         Plugins.Add(new ServerEventsFeature()
@@ -58,7 +59,7 @@ public class AppHost : AppHostBase, IHostingStartup
             },
             LimitToAuthenticatedUsers = false,
         });
-        JsConfig.TextCase = TextCase.CamelCase;
+        JsConfig.TextCase = TextCase.PascalCase;
    
         container.AddSingleton<TagMangager>();
         var sef = new ServerEventsFeature
