@@ -1,48 +1,27 @@
-using ClipHost.ServiceModel.CreateCommandCenterModels;
-using Microsoft.AspNetCore.Hosting;
-using ServiceStack;
-using ServiceStack.Auth;
-using ServiceStack.Configuration;
-using ServiceStack.Logging;
-using System.Linq;
-using ServiceStack.OrmLite;
-using ServiceStack.FluentValidation;
 using System;
 using System.Threading.Tasks;
+using ClipHost.ServiceModel.CreateCommandCenterModels;
+using ServiceStack;
+using ServiceStack.OrmLite;
 
-namespace ClipHost.ServiceModel.CreateCommandCenterService
+namespace ClipHost.ServiceModel.CreateCommandCenterService;
+
+public class CreateCommandCenter : Service
 {
-
-
-    public class CreateCommandCenter : ServiceStack.Service
+    public async Task<CreateCommandCenterResponse> Post(CreateCommandCenterRequest request)
     {
-
-
-
-        public async Task<CreateCommandCenterResponse> Post(CreateCommandCenterRequest request)
+        try
         {
-
-            try
-            {
-                var id = Db.Insert(request.CommandCenter, true);
-                return new CreateCommandCenterResponse() { Id = id }               ;
-            }
-            catch (Exception e)
-            {
-                return     new CreateCommandCenterResponse() {
-                      Success = false, 
-                    Message = e.Message
-                };
-            }
-            finally
-            {
-
-            }
-
-
-
-
+            var id = Db.Insert(request.CommandCenter, true);
+            return new CreateCommandCenterResponse { Id = id };
         }
-
+        catch (Exception e)
+        {
+            return new CreateCommandCenterResponse
+            {
+                Success = false,
+                Message = e.Message
+            };
+        }
     }
 }

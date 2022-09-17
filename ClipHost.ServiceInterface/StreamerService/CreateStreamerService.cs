@@ -1,31 +1,28 @@
-using ClipHost.ServiceModel.CreateStreamerModels;
-using ServiceStack.OrmLite;
 using System;
 using System.Threading.Tasks;
+using ClipHost.ServiceModel.CreateStreamerModels;
+using ServiceStack;
+using ServiceStack.OrmLite;
 
-namespace ClipHost.ServiceModel.CreateStreamerService
+namespace ClipHost.ServiceModel.CreateStreamerService;
+
+public class CreateStreamer : Service
 {
-    public class CreateStreamer : ServiceStack.Service
+    public async Task<CreateStreamerResponse> Post(CreateStreamerRequest request)
     {
-        public async Task<CreateStreamerResponse> Post(CreateStreamerRequest request)
+        try
         {
-            try
+            var id = Db.Insert(request.Streamer, true);
+            return
+                new CreateStreamerResponse { Id = id };
+        }
+        catch (Exception e)
+        {
+            return new CreateStreamerResponse
             {
-                var id = Db.Insert(request.Streamer, true);
-                return
-                new CreateStreamerResponse() { Id = id }                ;
-            }
-            catch (Exception e)
-            {
-                return new CreateStreamerResponse()
-                {
-                    Success = false,
-                    Message = e.Message
-                };
-            }
-            finally
-            {
-            }
+                Success = false,
+                Message = e.Message
+            };
         }
     }
 }

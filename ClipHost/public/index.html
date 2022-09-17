@@ -13,7 +13,7 @@
   {{ 'buttons,svg-auth,app' |> cssIncludes }}
   {{ 'svg-icons'            |> cssIncludes |> svgFill('#41B883') }}
   {{#script}}
-    {{ '/js/hot-fileloader.js'    |> onlyIfDebug |> includeFile }}
+ 
     NAV_ITEMS = {{ 'GetNavItems'  |> execService |> json }};
     AUTH      = {{ 'Authenticate' |> execService({ ifErrorReturn: "null" }) |> json }};
   {{/script}}

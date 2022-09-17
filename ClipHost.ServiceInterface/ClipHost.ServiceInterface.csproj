@@ -1,20 +1,20 @@
- <Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.9" />
-    <PackageReference Include="ServiceStack" Version="6.*" />
-    <PackageReference Include="ServiceStack.OrmLite" Version="6.3.0" />
-    <PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.3.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.9" />
+        <PackageReference Include="ServiceStack" Version="6.*" />
+        <PackageReference Include="ServiceStack.OrmLite" Version="6.3.0" />
+        <PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.3.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ClipHost.ServiceModel\ClipHost.ServiceModel.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ClipHost.ServiceModel\ClipHost.ServiceModel.csproj" />
+    </ItemGroup>
 
 </Project>

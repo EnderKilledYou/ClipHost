@@ -12,45 +12,43 @@ using ClipHost.ServiceModel;
 using System;
 using ServiceStack.Auth;
 using System.Net;
+using BlazorQueue;
 using ServiceStack.Text;
 
 [assembly: HostingStartup(typeof(ClipHost.AppHost))]
 
 namespace ClipHost;
 
-public class AppHost : AppHostBase, IHostingStartup
+public partial class AppHost : AppHostBase, IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureServices(services => {
+        .ConfigureServices(services =>
+        {
             // Configure ASP.NET Core IOC Dependencies
         });
 
-    public AppHost() : base("ClipHost", typeof(MyServices).Assembly) {}
-    public override void Configure(IServiceCollection services)
-    {
-        services.AddHostedService<ParentServerConnector>();
-        services.AddControllers().AddJsonOptions(options =>
-        {
-            // Use the default property (Pascal) casing.
-            options.JsonSerializerOptions.PropertyNamingPolicy = null;
-        });
-    }
+    public AppHost() : base("ClipHost", typeof(MyServices).Assembly) { }
+    
+    
     public override void Configure(Container container)
     {
-       
-        Plugins.Add(new SharpPagesFeature {
-            EnableSpaFallback = true
-        }); 
 
-        SetConfig(new HostConfig {
+        Plugins.Add(new SharpPagesFeature
+        {
+            EnableSpaFallback = true
+        });
+        this.
+        SetConfig(new HostConfig
+        {
             AddRedirectParamsToQueryString = true,
-           UseCamelCase=false,
-           
+            UseCamelCase = false,
+
         });
         Plugins.Add(new ValidationFeature());
         Plugins.Add(new ServerEventsFeature()
         {
-            OnCreated = (sub, req) => {
+            OnCreated = (sub, req) =>
+            {
                 var session = req.GetSession();
                 if (!session.IsAuthenticated) return;
                 //sub.Meta["Nickname"] = session.Nickname;           // channel subscribers
@@ -60,42 +58,47 @@ public class AppHost : AppHostBase, IHostingStartup
             LimitToAuthenticatedUsers = false,
         });
         JsConfig.TextCase = TextCase.PascalCase;
-   
+ 
         container.AddSingleton<TagMangager>();
         var sef = new ServerEventsFeature
         {
-          OnConnect = (sub, req) => { 
-          
-          
-          },
-          OnSubscribeAsync = async ( sub) =>
-          {
-              
-          }
+            OnConnect = (sub, req) =>
+            {
+
+
+            },
+            OnSubscribeAsync = async (sub) =>
+            {
+
+            }
         };
         Plugins.Add(sef);
-        
+  
+   
+   
 
-        container.AddSingleton(a => new ParentServer("", new Guid().ToString())); //
+
 
         ServicePointManager.DefaultConnectionLimit = 1000;
 
     }
+
+
     public class ParentReceiver : ServerEventReceiver
 
     {
-       
+
         public override void NoSuchMethod(string selector, object message)
         {
             base.NoSuchMethod(selector, message);
         }
     }
-        class ParentServerConnector : BackgroundService
+    class ParentServerConnector : BackgroundService
     {
         private readonly ParentServer parentServer;
         private readonly ILogger logger;
 
-        public ParentServerConnector(ParentServer parentServer,ILogger logger)
+        public ParentServerConnector(ParentServer parentServer, ILogger logger)
         {
             this.parentServer = parentServer;
             this.logger = logger;
@@ -111,9 +114,9 @@ public class AppHost : AppHostBase, IHostingStartup
                 Password = "pass",
                 RememberMe = true,
             });
-            var parent =   parentServer.Start();
-           
-            if(parent == null)
+            var parent = parentServer.Start();
+
+            if (parent == null)
             {
                 logger.LogError("Could not connect to parent");
                 //todo: exception
@@ -131,7 +134,7 @@ public class AppHost : AppHostBase, IHostingStartup
             parentServer.OnUpdate += OnUpdate;
             parentServer.ServiceClient.Post(new Hello());
             parentServer.RegisterReceiver<ParentReceiver>();
-            
+
 
 
         }
@@ -143,7 +146,7 @@ public class AppHost : AppHostBase, IHostingStartup
 
         private void OnMessage(ServerEventMessage obj)
         {
-            
+
             throw new NotImplementedException();
         }
 

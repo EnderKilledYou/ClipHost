@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceStack;
 using ServiceStack.Auth;
@@ -10,6 +11,8 @@ namespace ClipHost
     // Add any additional metadata properties you want to store in the Users Typed Session
     public class CustomUserSession : AuthUserSession
     {
+        [DataMember] public string? TwitchUserId { get; set; }
+        
     }
     
 // Custom Validator to add custom validators to built-in /register Service requiring DisplayName and ConfirmPassword
@@ -33,11 +36,11 @@ namespace ClipHost
             })
             .ConfigureAppHost(appHost => {
                 var appSettings = appHost.AppSettings;
+           
                 appHost.Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                     new IAuthProvider[] {
                         new CredentialsAuthProvider(appSettings),     
-                        
-           
+                        new TwitchOauthProvider(appSettings) 
                     }));
  
 

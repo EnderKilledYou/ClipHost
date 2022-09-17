@@ -1,4 +1,4 @@
-using BlazorQueue.ServiceInterface;
+using BlazorQueue; 
 using ClipHost.ServiceModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,19 +31,17 @@ public class IntegrationTest
             options.PayloadSerializerOptions.PropertyNamingPolicy = null;
         }); 
         var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
+         
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseExceptionHandler("/Error"); 
             app.UseHsts();
             app.UseHttpsRedirection();
         }
         app.Urls.Add(baseUri);
 
         app.UseServiceStack(new AppHost());
-        app.MapHub<ServiceGatewayHub>("/ServiceGatewayHub", options =>
+        app.MapHub < BlazorHub>("/BlazorHub", options =>
         {
             options.Transports =
                 HttpTransportType.WebSockets |
@@ -85,15 +83,10 @@ public class IntegrationTest
  
     public BlazorInstanceFacade CreateDefaultclient()
     {
-        var info = new HubConnectionInfo()
-        {
-            accessTokenProvider = AccessTokenProvider,
-            HostUrl = BaseUri,
-            HubName = "ServiceGatewayHub"
-        };
+        var info = new HubConnectionInfo(BaseUri, "BlazorHub", AccessTokenProvider);
  
 
-        BlazorInstanceFacade parent = new BlazorInstanceFacade(info);
+        BlazorInstanceFacade parent = new(info);
         return  new BlazorInstanceFacade(parent);
       
     } 
@@ -103,8 +96,7 @@ public class IntegrationTest
     {
         
         var client = CreateDefaultclient();
-
-        client.RegisterType<HelloResponse, Hello>();
+         
         await client.Start();
         Assert.That(client.Active, Is.True);
 
@@ -117,31 +109,21 @@ public class IntegrationTest
     [Test]
     public async Task Can_call_several_Hello_Service_with_client_response()
     {
-        var client = CreateDefaultclient();
-        client.RegisterType<HelloResponse, Hello>();
+        var client = CreateDefaultclient(); 
         await client.Start();
         Assert.That(client.Active, Is.True);
 
         var response = await client.SendAllAsync<HelloTestResponse, HelloTest>(new HelloTest[] { new HelloTest() { Name = "World" } });
 
         HelloTestResponse helloResponse = response.FirstNonDefault();
-        var count = 0;
-        while (!client.LocalHit)
-        {
-            await Task.Delay(100);
-            if (count > 300)
-            {
-                Assert.That(false, Is.Not.False);
-            }
-        }
+     
         Assert.That(helloResponse, Is.Not.Null);
         Assert.That(helloResponse.Result, Is.EqualTo("Hello, World!"));
     }
     [Test]
     public async Task Can_call_several_Hello_Service()
     {
-        var client = CreateDefaultclient();
-        client.RegisterType<HelloResponse, Hello>();
+        var client = CreateDefaultclient(); 
         await client.Start();
         Assert.That(client.Active, Is.True);
 
@@ -155,8 +137,7 @@ public class IntegrationTest
     [Test]
     public async Task Can_call_faf_all_Hello_Service()
     {
-        var client = CreateDefaultclient();
-        client.RegisterType<HelloResponse, Hello>();
+        var client = CreateDefaultclient(); 
         await client.Start();
         Assert.That(client.Active, Is.True);
 
@@ -166,8 +147,7 @@ public class IntegrationTest
     [Test]
     public async Task Can_call_faf_Hello_Service()
     {
-        var client = CreateDefaultclient();
-        client.RegisterType<HelloResponse, Hello>();
+        var client = CreateDefaultclient(); 
         await client.Start();
         Assert.That(client.Active, Is.True);
 
