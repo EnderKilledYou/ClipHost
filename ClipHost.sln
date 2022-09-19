@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClipHost.Tests", "ClipHost.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorQueue", "BlazorQueue\BlazorQueue.csproj", "{8D8084E3-DC39-46B8-B25E-3822745A4516}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipHunta2", "ClipHunta2\ClipHunta2.csproj", "{A70F986E-5DE0-4E5C-8A95-C5D7636FF4F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{8D8084E3-DC39-46B8-B25E-3822745A4516}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D8084E3-DC39-46B8-B25E-3822745A4516}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D8084E3-DC39-46B8-B25E-3822745A4516}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A70F986E-5DE0-4E5C-8A95-C5D7636FF4F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A70F986E-5DE0-4E5C-8A95-C5D7636FF4F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A70F986E-5DE0-4E5C-8A95-C5D7636FF4F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A70F986E-5DE0-4E5C-8A95-C5D7636FF4F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

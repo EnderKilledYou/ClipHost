@@ -1,13 +1,14 @@
 ﻿using BlazorQueue;
 using Microsoft.AspNetCore.Http.Connections;
- 
+using ServiceStack.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR().AddJsonProtocol(options => {
     options.PayloadSerializerOptions.PropertyNamingPolicy = null;
 }); ;
-builder.Services .AddHostedService<ClipProcessWrangler>();
-builder.Services .AddSingleton<ClipIdManager>();
+builder.Services .AddSingleton<StreamerProcessWrangler>();
+ 
+ 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,5 +33,6 @@ options.Transports =
     HttpTransportType.WebSockets |
     HttpTransportType.LongPolling;
 });
-
+var monitorLoop = app.Services.GetRequiredService<StreamerProcessWrangler>();
+await monitorLoop.StartAsync(default);
 app.Run();

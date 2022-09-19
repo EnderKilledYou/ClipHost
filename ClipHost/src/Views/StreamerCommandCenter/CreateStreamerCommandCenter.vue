@@ -1,87 +1,47 @@
-<template ><section ><div ><h4 >Create StreamerCommandCenterMask</h4>
-<b-alert :show="true" v-if="DataModel.Message.length >0">{{  DataModel.Message }}</b-alert>
-<b-form-group id="fieldset-StreamerId" description="" label="StreamerId" label-for="input-StreamerId" valid-feedback="">
-    <b-form-input id="fieldset-StreamerId" :disabled="false" v-model="DataModel.StreamerId" type="number" :trim="true"></b-form-input></b-form-group>
-<b-form-group id="fieldset-CommandCenterId" description="" label="CommandCenterId" label-for="input-CommandCenterId" valid-feedback=""><b-form-input id="fieldset-CommandCenterId" :disabled="false" v-model="DataModel.CommandCenterId" type="number" :trim="true"></b-form-input></b-form-group>
-<b-button @click="CreateStreamerCommandCenter(DataModel)">Create</b-button></div></section></template><script lang="ts">
+<template>
+    <section>
+        <div>
+            <h4>Assign Streamer</h4>
+            <b-alert :show="true" v-if="DataModel.Message.length >0">{{  DataModel.Message }}</b-alert>
+            <b-form-group id="fieldset-StreamerId" description="" label="Streamer" label-for="input-StreamerId" valid-feedback="">
+
+                <b-form-select v-model="DataModel.StreamerId" class="mb-3">
+                    <b-form-select-option :value="0">Please select an option</b-form-select-option>
+                    <b-form-select-option :key="a.Id" :value="a.Id" v-for="a in streamers">{{a.Name}}</b-form-select-option>
+                </b-form-select>
+
+            </b-form-group>
+
+            <b-button @click="CreateStreamerCommandCenter(DataModel)">Create</b-button>
+        </div>
+    </section>
+</template>
+<script lang="ts">
     console.log("");
     import { Component, Vue } from 'vue-property-decorator'
     import { Mixins } from 'vue-property-decorator'
-    import { client } from '@/shared'
-    import { CreateStreamerCommandCenterRequest, StreamerCommandCenter, CreateStreamerCommandCenterResponse } from '@/shared/dtos'
-
-
-    export class StreamerCommandCenterCreateMask extends StreamerCommandCenter {
-
+    import StreamerCommandCenterApiMixin, { StreamerCommandCenterCreateMask } from './StreamerCommandCenter'
+    import StreamerApiMixin, { StreamerListMask } from '@/Views/Streamer/ListStreamerMix'
+    import { StreamerCommandCenter } from '@/shared/dtos'
 
 
 
-        Message: string = ""
-
-
-
-        Success: boolean = true
-
-
-
-        Completed: boolean = true
-
-
-
-        Error: string = ""
-
-
-
-
-        constructor(init?: Partial<StreamerCommandCenterCreateMask>) {
-
-            super()
-                ;
-            (Object as any).assign(this, init)
-
-        }
-
-    }
 
 
 
     @Component({ components: {} })
-    export class StreamerCommandCenterApiMixin extends Vue {
+    export default class CreateStreamerCommandCenter extends Mixins(StreamerCommandCenterApiMixin, StreamerApiMixin, StreamerCommandCenterApiMixin) {
+        async created() {
 
 
 
-
-
-
-        async CreateStreamerCommandCenter(DataModel: StreamerCommandCenterCreateMask) {
-
-            try {
-                const Response: CreateStreamerCommandCenterResponse = await client.post(new CreateStreamerCommandCenterRequest({ StreamerCommandCenter: DataModel }))
-                DataModel.Success = Response.Success;
-                if (Response.Id > 0) { DataModel.Message = 'Created' } else { DataModel.Message = Response.Message; }
-            } catch (e: any) {
-                DataModel.Message = e.message;
-                console.log(e)
-            } finally {
-
-            }
-
-
-
+            this.streamers = await this.ListStreamer([], 0, "");;
 
         }
+        streamers: StreamerListMask[] = []
+        selectedStreamer: number = -1;
 
-    }
-
-
-
-    @Component({ components: {} })
-    export default class CreateStreamerCommandCenter extends Mixins(StreamerCommandCenterApiMixin) {
-
-
-
-
-        DataModel: StreamerCommandCenterCreateMask = new StreamerCommandCenterCreateMask(new StreamerCommandCenter({}))
+        DataModel: StreamerCommandCenterCreateMask = new StreamerCommandCenterCreateMask(new StreamerCommandCenter({ Id: 1, StreamerId: 0 }))
 
 
 

@@ -1,7 +1,16 @@
-<template ><section ><div ><h4 >Create StreamerMask</h4>
-<b-alert :show="true" v-if="DataModel.Message.length >0">{{  DataModel.Message }}</b-alert>
-<b-form-group id="fieldset-Name" description="" label="Name" label-for="input-Name" valid-feedback=""><b-form-input id="fieldset-Name" :disabled="false" v-model="DataModel.Name" type="text" :trim="true"></b-form-input></b-form-group>
-<b-button @click="CreateStreamer(DataModel)">Create</b-button></div></section></template><script lang="ts">
+<template>
+    <section>
+        <div>
+            <h4>Create StreamerMask</h4>
+            <b-alert :show="true" v-if="DataModel.Message.length >0">{{  DataModel.Message }}</b-alert>
+            <b-form-group id="fieldset-Name" description="" label="Name" label-for="input-Name" valid-feedback="">
+                <b-form-input id="fieldset-Name" :disabled="false" v-model="DataModel.Name" type="text" :trim="true"></b-form-input>
+            </b-form-group>
+            <b-button @click="CreateStreamer(DataModel)">Create</b-button>
+        </div>
+    </section>
+</template>
+<script lang="ts">
     console.log("");
     import { Component, Vue } from 'vue-property-decorator'
     import { Mixins } from 'vue-property-decorator'

@@ -44,34 +44,13 @@ namespace BlazorQueue
     }
     public class BlazorHub : ServiceGatewayHub<IBlazorInstanceFacade>
     {
-        public BlazorHub(BlazorHubIdManager blazorHubIdManager) : base(blazorHubIdManager)
-        {
-            
-        }
+    
     }
     public class ServiceGatewayHub<T> : Hub<T> where T : class
     {
 
-        private readonly HubIdManager _idManager;
-
-        public ServiceGatewayHub(HubIdManager idManager)
-        {
-            _idManager = idManager;
-        }
-
-        public override Task OnConnectedAsync()
-        {
-            Console.WriteLine("ok");
-            _idManager.AddConnection(this.Context.ConnectionId);
-
-            return base.OnConnectedAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception? exception)
-        {
-            _idManager.RemoveConnection(this.Context.ConnectionId);
-            return base.OnDisconnectedAsync(exception);
-        }
+        
+ 
 
         private readonly MethodInfo? mi;
 

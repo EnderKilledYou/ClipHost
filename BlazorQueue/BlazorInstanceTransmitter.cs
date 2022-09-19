@@ -43,12 +43,14 @@ namespace BlazorQueue
         {
             if (connection == null) return;
             await connection.StartAsync();
+            await connection!.SendAsync("Register", Environment.ProcessId);
         }
 
         public async Task Stop()
         {
             if (connection == null) return;
             await connection.StopAsync();
+            
         }
 
 

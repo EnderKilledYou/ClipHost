@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -27,12 +28,40 @@ namespace ClipHost.ServiceModel
     [TableUp(1)]
     public class CommandCenter : TablesUp
     {
- 
+
         public string Name { get; set; } = "";
         public int StreamerCount { get; set; } = 0;
         public int MaxStreamers { get; set; } = 0;
 
-  
+
+    }
+
+    public class QueueReport
+    {
+        public QueueReport(int id,int size, int maxSize, int averageSeconds, int highSeconds, int low, string name, int processId)
+        {
+            Id = id;
+            Size = size;
+            MaxSize = maxSize;
+            AverageSeconds = averageSeconds;
+            HighSeconds = highSeconds;
+            Low = low;
+            Name = name;
+            ProcessId = processId;
+        }
+
+        public int Id { get; }
+        public int Size { get; set; }
+        public int MaxSize { get; set; }
+
+        public int AverageSeconds { get; set; }
+
+        public int HighSeconds { get; set; }
+        public int Low { get; set; }
+        [SearchField]
+        public string Name { get; set; }
+        [PrimaryKey]
+        public int ProcessId { get; }
     }
     [TableUp(1)]
     public class Streamer : TablesUp
@@ -40,13 +69,13 @@ namespace ClipHost.ServiceModel
         [PrimaryKey]
         [AutoIncrement]
         public int Id { get; set; }
-        
+
         [SearchField]
         [Required]
         public string Name { get; set; } = "";
     }
     [TableUp(2)]
-    [CompositeKey("CommandCenterId","StreamerId")]
+    [CompositeKey("CommandCenterId", "StreamerId")]
     public class StreamerCommandCenter : TablesUp
     {
         [PrimaryKey]
@@ -60,7 +89,7 @@ namespace ClipHost.ServiceModel
         [Required]
         [References(typeof(CommandCenter))]
 
-        public int CommandCenterId { get; set; } = 0;   
+        public int CommandCenterId { get; set; } = 0;
     }
     [TableUp(1)]
     public class MonitoredStreamType : TablesUp
@@ -72,7 +101,7 @@ namespace ClipHost.ServiceModel
         public string StreamType { get; set; } = ""; //twitch, yt etc
     }
 
-    [TableUp(2)] 
+    [TableUp(2)]
     public class MonitoredVideoStream : TablesUp
     {
         [PrimaryKey]

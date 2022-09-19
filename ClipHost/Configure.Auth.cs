@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceStack;
 using ServiceStack.Auth;
+using ServiceStack.Configuration;
 using ServiceStack.FluentValidation;
 
 [assembly: HostingStartup(typeof(ClipHost.ConfigureAuth))]
@@ -36,7 +37,7 @@ namespace ClipHost
             })
             .ConfigureAppHost(appHost => {
                 var appSettings = appHost.AppSettings;
-           
+            
                 appHost.Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                     new IAuthProvider[] {
                         new CredentialsAuthProvider(appSettings),     

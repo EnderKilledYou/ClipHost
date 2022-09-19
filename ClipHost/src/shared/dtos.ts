@@ -1,5 +1,5 @@
 /* Options:
-Date: 2022-09-08 03:13:12
+Date: 2022-09-18 23:53:29
 Version: 6.21
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://localhost:5001
@@ -79,6 +79,34 @@ export class CommandCenter extends TablesUp
     public constructor(init?: Partial<CommandCenter>) { super(init); (Object as any).assign(this, init); }
 }
 
+export class ProgramInstance implements IHaveBlazorConnection, IProgramInstance
+{
+
+    public constructor(init?: Partial<ProgramInstance>) { (Object as any).assign(this, init); }
+}
+
+export class DtoProgramInstance extends ProgramInstance
+{
+    public DtoId?: number;
+    public ReportsArray: QueueReport[];
+
+    public constructor(init?: Partial<DtoProgramInstance>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class QueueReport
+{
+    public Id: number;
+    public Size: number;
+    public MaxSize: number;
+    public AverageSeconds: number;
+    public HighSeconds: number;
+    public Low: number;
+    public Name: string;
+    public ProcessId: number;
+
+    public constructor(init?: Partial<QueueReport>) { (Object as any).assign(this, init); }
+}
+
 // @DataContract
 export class ResponseError
 {
@@ -122,11 +150,36 @@ export interface ITableUp
 {
 }
 
+export interface IHaveBlazorConnection
+{
+}
+
+export interface IProgramInstance
+{
+}
+
+export class HelloTestResponse
+{
+    public Result: string;
+
+    public constructor(init?: Partial<HelloTestResponse>) { (Object as any).assign(this, init); }
+}
+
 export class HelloResponse
 {
     public Result: string;
 
     public constructor(init?: Partial<HelloResponse>) { (Object as any).assign(this, init); }
+}
+
+export class ListDtoProgramInstanceResponse
+{
+    public Count: number;
+    public Message: string;
+    public Success: boolean;
+    public DtoProgramInstances: DtoProgramInstance[];
+
+    public constructor(init?: Partial<ListDtoProgramInstanceResponse>) { (Object as any).assign(this, init); }
 }
 
 export class ListStreamerResponse
@@ -155,6 +208,16 @@ export class CreateStreamerCommandCenterResponse
     public Success: boolean;
 
     public constructor(init?: Partial<CreateStreamerCommandCenterResponse>) { (Object as any).assign(this, init); }
+}
+
+export class ListQueueReportResponse
+{
+    public Count: number;
+    public Message: string;
+    public Success: boolean;
+    public QueueReports: QueueReport[];
+
+    public constructor(init?: Partial<ListQueueReportResponse>) { (Object as any).assign(this, init); }
 }
 
 export class CreateCommandCenterResponse
@@ -244,40 +307,16 @@ export class UnAssignRolesResponse
     public constructor(init?: Partial<UnAssignRolesResponse>) { (Object as any).assign(this, init); }
 }
 
-// @DataContract
-export class RegisterResponse implements IHasSessionId, IHasBearerToken
+// @Route("/test")
+// @Route("/test/{Name}")
+export class HelloTest implements IReturn<HelloTestResponse>
 {
-    // @DataMember(Order=1)
-    public UserId: string;
+    public Name: string;
 
-    // @DataMember(Order=2)
-    public SessionId: string;
-
-    // @DataMember(Order=3)
-    public UserName: string;
-
-    // @DataMember(Order=4)
-    public ReferrerUrl: string;
-
-    // @DataMember(Order=5)
-    public BearerToken: string;
-
-    // @DataMember(Order=6)
-    public RefreshToken: string;
-
-    // @DataMember(Order=7)
-    public Roles: string[];
-
-    // @DataMember(Order=8)
-    public Permissions: string[];
-
-    // @DataMember(Order=9)
-    public ResponseStatus: ResponseStatus;
-
-    // @DataMember(Order=10)
-    public Meta: { [index: string]: string; };
-
-    public constructor(init?: Partial<RegisterResponse>) { (Object as any).assign(this, init); }
+    public constructor(init?: Partial<HelloTest>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'HelloTest'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new HelloTestResponse(); }
 }
 
 // @Route("/hello")
@@ -290,6 +329,16 @@ export class Hello implements IReturn<HelloResponse>
     public getTypeName() { return 'Hello'; }
     public getMethod() { return 'POST'; }
     public createResponse() { return new HelloResponse(); }
+}
+
+export class ListDtoProgramInstanceRequest implements IReturn<ListDtoProgramInstanceResponse>
+{
+    public After: number;
+
+    public constructor(init?: Partial<ListDtoProgramInstanceRequest>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'ListDtoProgramInstanceRequest'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new ListDtoProgramInstanceResponse(); }
 }
 
 export class ListStreamerRequest implements IReturn<ListStreamerResponse>
@@ -321,6 +370,17 @@ export class CreateStreamerCommandCenterRequest implements IReturn<CreateStreame
     public getTypeName() { return 'CreateStreamerCommandCenterRequest'; }
     public getMethod() { return 'POST'; }
     public createResponse() { return new CreateStreamerCommandCenterResponse(); }
+}
+
+export class ListQueueReportRequest implements IReturn<ListQueueReportResponse>
+{
+    public After: number;
+    public Name: string;
+
+    public constructor(init?: Partial<ListQueueReportRequest>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'ListQueueReportRequest'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new ListQueueReportResponse(); }
 }
 
 export class CreateCommandCenterRequest implements IReturn<CreateCommandCenterResponse>
@@ -447,49 +507,5 @@ export class UnAssignRoles implements IReturn<UnAssignRolesResponse>, IPost
     public getTypeName() { return 'UnAssignRoles'; }
     public getMethod() { return 'POST'; }
     public createResponse() { return new UnAssignRolesResponse(); }
-}
-
-/**
-* Sign Up
-*/
-// @Route("/register", "PUT,POST")
-// @Api(Description="Sign Up")
-// @DataContract
-export class Register implements IReturn<RegisterResponse>, IPost
-{
-    // @DataMember(Order=1)
-    public UserName: string;
-
-    // @DataMember(Order=2)
-    public FirstName: string;
-
-    // @DataMember(Order=3)
-    public LastName: string;
-
-    // @DataMember(Order=4)
-    public DisplayName: string;
-
-    // @DataMember(Order=5)
-    public Email: string;
-
-    // @DataMember(Order=6)
-    public Password: string;
-
-    // @DataMember(Order=7)
-    public ConfirmPassword: string;
-
-    // @DataMember(Order=8)
-    public AutoLogin?: boolean;
-
-    // @DataMember(Order=10)
-    public ErrorView: string;
-
-    // @DataMember(Order=11)
-    public Meta: { [index: string]: string; };
-
-    public constructor(init?: Partial<Register>) { (Object as any).assign(this, init); }
-    public getTypeName() { return 'Register'; }
-    public getMethod() { return 'POST'; }
-    public createResponse() { return new RegisterResponse(); }
 }
 

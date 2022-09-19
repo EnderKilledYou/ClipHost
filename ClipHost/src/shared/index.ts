@@ -14,7 +14,7 @@ export {
 export {
     ResponseStatus, ResponseError,
     Authenticate, AuthenticateResponse,
-    Register,
+   
     Hello, HelloResponse,
 } from './dtos';
 
