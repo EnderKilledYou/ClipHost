@@ -1,4 +1,4 @@
-﻿namespace ClipHost
+﻿namespace BlazorQueue
 {
     public interface IAcceptConnections
     {

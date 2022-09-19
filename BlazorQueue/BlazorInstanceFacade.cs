@@ -18,9 +18,9 @@ namespace BlazorQueue
 
     public class BlazorInstanceFacade : BlazorFacadeConnectionBase,  IAsyncDisposable, IJsonOnDeserialized, IConnectFacadesBinary, IBlazorInstanceFacade
     {
-        protected BlazorInstanceFacade? ParentFacade { get; init; }
+        protected BlazorInstanceFacade? ParentFacade { get;  }
 
-        protected BlazorInstanceFacade[] _subFacades = new BlazorInstanceFacade[2];
+        protected readonly BlazorInstanceFacade[] SubFacades = new BlazorInstanceFacade[2];
         /// <summary>
         ///  Pass in the parent facade 
         ///  
@@ -65,15 +65,13 @@ namespace BlazorQueue
         /// <returns></returns>
         public override async Task<object?> LocalSendAsync(MetaPacket requestDto)
         {
-            Type? responseType = requestDto.GetResponseType();
-            Type? requestType = requestDto.GetRequestType();
-            if (responseType != null && requestType != null)
-            {
-             
-                var result = await GetServiceGateway("LocalSendAsync", requestType.Name, responseType.Name).SendAsync(responseType, JsonSerializer.Deserialize(requestDto.Data, requestType)).ConfigureAwait(false); ;
-                return result;
-            }
-            return null;
+            var responseType = requestDto.GetResponseType();
+            var requestType = requestDto.GetRequestType();
+            if (responseType == null || requestType == null) 
+                return null;
+            
+            var result = await GetServiceGateway("LocalSendAsync", requestType.Name, responseType.Name).SendAsync(responseType, requestDto.Data.Deserialize(requestType)).ConfigureAwait(false); ;
+            return result;
         }
 
         /// <summary>
@@ -83,24 +81,22 @@ namespace BlazorQueue
         /// <returns></returns>
         public override async Task<object?> LocalSendAllAsync(MetaPacket requestDtos)
         {
-            if(mi == null)
+            if(Mi == null)
             {
                 return null;
             }
-            Type? responseType = requestDtos.GetResponseType();
-            Type? requestType = requestDtos.GetRequestType();
-            if (responseType != null && requestType != null)
-            {
-                var bv = GetServiceGateway("LocalSendAsync", requestType.Name, responseType.Name);
-                var obj = JsonSerializer.Deserialize(requestDtos.Data, requestType);
-                var fooRef = mi.MakeGenericMethod(responseType);
-                if (@fooRef.Invoke(bv, new object?[] { obj, null }) is not Task result)
-                    return null;
-                await result.ConfigureAwait(false);
-                return result.GetType().GetProperty("Result")?.GetValue(result);
-            }
+            var responseType = requestDtos.GetResponseType();
+            var requestType = requestDtos.GetRequestType();
+            if (responseType == null || requestType == null) 
+                return null;
+            var bv = GetServiceGateway("LocalSendAsync", requestType.Name, responseType.Name);
+            var obj = requestDtos.Data.Deserialize(requestType);
+            var fooRef = Mi.MakeGenericMethod(responseType);
+            if (@fooRef.Invoke(bv, new object?[] { obj, null }) is not Task result)
+                return null;
+            await result.ConfigureAwait(false);
+            return result.GetType().GetProperty("Result")?.GetValue(result);
 
-            return null;
         }
 
         /// <summary>
@@ -116,7 +112,7 @@ namespace BlazorQueue
 
             if (responseType != null && requestType != null)
             {
-                var obj = JsonSerializer.Deserialize(requestDto.Data, requestType);
+                var obj = requestDto.Data.Deserialize(requestType);
                 await GetServiceGateway("LocalPublishAsync", requestType.Name, responseType.Name).PublishAsync(obj).ConfigureAwait(false);
  
             }
@@ -130,7 +126,7 @@ namespace BlazorQueue
         public override async Task LocalPublishAllAsync(MetaPacket requestDtos)
 
         {
-            if(puba == null)
+            if(Puba == null)
             {
                 return;
             }
@@ -140,13 +136,28 @@ namespace BlazorQueue
             {
                 var bv = GetServiceGateway("LocalPublishAllAsync", requestType.Name, responseType.Name);
 
-                var obj = JsonSerializer.Deserialize(requestDtos.Data, requestType);
-                if (puba.Invoke(bv, new object?[] { obj, null }) is not Task result)
+                var obj = requestDtos.Data.Deserialize(requestType);
+                if (Puba.Invoke(bv, new object?[] { obj, null }) is not Task result)
                 {
                     return;
                 }
                 await result.ConfigureAwait(false);
             }
+        }
+
+        protected override async Task Connection_Closed(Exception? arg)
+        {
+          
+        }
+
+        protected override async  Task Connection_Reconnected(string? arg)
+        {
+          
+        }
+
+        protected override async  Task Connection_Reconnecting(Exception? arg)
+        {
+            
         }
 
         /// <summary>
@@ -155,7 +166,7 @@ namespace BlazorQueue
         /// <returns></returns>
         public IConnectFacadesBinary GetLeftFacade()
         {
-            return _subFacades[0];
+            return SubFacades[0];
         }
 
         /// <summary>
@@ -164,19 +175,19 @@ namespace BlazorQueue
         /// <returns></returns>
         public IConnectFacadesBinary GetRightFacade()
         {
-            return _subFacades[1];
+            return SubFacades[1];
         }
 
         public void GetAllFacades(IConnectFacades[] connectFacades)
         {
-            if (connectFacades.Length != _subFacades.Length + 1)
+            if (connectFacades.Length != SubFacades.Length + 1)
             {
-                throw new ArgumentException($"Need array of size {_subFacades.Length + 1}");
+                throw new ArgumentException($"Need array of size {SubFacades.Length + 1}");
             }
             connectFacades[0] = GetParentFacade();
-            for (int i = 0; i < _subFacades.Length; i++)
+            for (int i = 0; i < SubFacades.Length; i++)
             {
-                connectFacades[i + 1] = _subFacades[i];
+                connectFacades[i + 1] = SubFacades[i];
             }
         }
 
@@ -198,12 +209,12 @@ namespace BlazorQueue
 
         public void SetLeftFacade(IConnectFacadesBinary left)
         {
-            _subFacades[0] = (BlazorInstanceFacade)left;
+            SubFacades[0] = (BlazorInstanceFacade)left;
         }
 
         public void SetRightFacade(IConnectFacadesBinary right)
         {
-            _subFacades[1] = (BlazorInstanceFacade)right;
+            SubFacades[1] = (BlazorInstanceFacade)right;
         }
     }
 }

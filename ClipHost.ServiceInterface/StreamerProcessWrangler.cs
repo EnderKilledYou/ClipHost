@@ -119,7 +119,7 @@ public class StreamerProcessWrangler : ProcessWranglerBase<DtoProgramInstance>
         var instance = dtoProgramInstances.FirstOrDefault(a => !((DtoProgramInstance)a).DtoId.HasValue);
         if (instance == null)
         {
-            return new AssignDtoResult(started: false, reason: "no available processes",
+            return new AssignDtoResult(Started: false, ReasonString: "no available processes",
                 AssignDtoResult.EReason.NoProcess);
         }
 

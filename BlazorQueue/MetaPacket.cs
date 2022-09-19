@@ -9,13 +9,7 @@ namespace BlazorQueue
         //todo: Some caching of types to speed this up
         public Type? GetRequestType()
         {
-            if (Type == null) return null;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                Type? responseType = assembly.GetType(Type);
-                if (responseType != null) return responseType;
-            }
-            return null;
+            return Type == null ? null : AppDomain.CurrentDomain.GetAssemblies().Select(assembly => assembly.GetType(Type)).FirstOrDefault(responseType => responseType != null);
         }
         /// <summary>
         /// 
@@ -23,13 +17,7 @@ namespace BlazorQueue
         /// <returns></returns>
         public Type? GetResponseType()
         {
-            if (ResponseType == null) return null;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                Type? responseType = assembly.GetType(ResponseType);
-                if (responseType != null) return responseType;
-            }
-            return null;
+            return ResponseType == null ? null : AppDomain.CurrentDomain.GetAssemblies().Select(assembly => assembly.GetType(ResponseType)).FirstOrDefault(responseType => responseType != null);
         }
     
         /// <summary>

@@ -26,7 +26,7 @@ namespace ClipHost
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error starting streamlink: {Message} {Stack}", e.Message, e.StackTrace);
+                Console.WriteLine("Error starting streamlink: {0} {1}", e.Message, e.StackTrace);
             }
 
             return null;

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
+ 
 
 namespace BlazorQueue
 {
@@ -13,11 +12,11 @@ namespace BlazorQueue
     }
     public abstract class BlazorFacadeConnectionBase  : BlazorInstanceTransmitter, IConnectToBlazor
     {
-        protected HubConnection? connection;
-        private readonly IDisposable? LocalSendAsyncConnection;
-        private readonly IDisposable? LocalSendAllAsyncConnection;
-        private readonly IDisposable? LocalPublishAsyncConnection;
-        private readonly IDisposable? LocalPublishAllAsyncConnection;
+        
+        private readonly IDisposable? _localSendAsyncConnection;
+        private readonly IDisposable? _localSendAllAsyncConnection;
+        private readonly IDisposable? _localPublishAsyncConnection;
+        private readonly IDisposable? _localPublishAllAsyncConnection;
         public void OnDeserialized()
         {
             Start().Wait();
@@ -26,18 +25,15 @@ namespace BlazorQueue
 
         public ValueTask DisposeAsync()
         {
-            LocalPublishAllAsyncConnection?.Dispose();
-            LocalPublishAsyncConnection?.Dispose();
-            LocalSendAllAsyncConnection?.Dispose();
-            LocalSendAsyncConnection?.Dispose();
-            if (connection != null)
-            {
-                var val = connection.DisposeAsync();
-                GC.SuppressFinalize(this);
+            _localPublishAllAsyncConnection?.Dispose();
+            _localPublishAsyncConnection?.Dispose();
+            _localSendAllAsyncConnection?.Dispose();
+            _localSendAsyncConnection?.Dispose();
+            if (Connection == null) return default;
+            var val = Connection.DisposeAsync();
+            GC.SuppressFinalize(this);
 
-                return val;
-            }
-            return default;
+            return val;
         }
         public abstract Task LocalSendAsync(MetaPacket requestDto);
 
@@ -53,7 +49,7 @@ namespace BlazorQueue
                 return;
 
             Uri url = new Uri(ParentConnection.HostUrl + ParentConnection.HubName);
-            connection = new HubConnectionBuilder()
+            Connection = new HubConnectionBuilder()
                          .WithUrl(url, options =>
                          {
                              options.AccessTokenProvider = ParentConnection.AccessTokenProvider;
@@ -63,47 +59,26 @@ namespace BlazorQueue
                          })
                     .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(1) })
                 .Build();
-            connection.Closed += Connection_Closed;
-            connection.Reconnected += Connection_Reconnected;
-            connection.Reconnecting += Connection_Reconnecting;
-            LocalSendAsyncConnection = connection.On<MetaPacket>("LocalSendAsync", LocalSendAsync);
-            LocalSendAllAsyncConnection = connection.On<MetaPacket>("LocalSendAllAsync", LocalSendAllAsync);
-            LocalPublishAsyncConnection = connection.On<MetaPacket>("LocalPublishAsync", LocalPublishAsync);
-            LocalPublishAllAsyncConnection = connection.On<MetaPacket>("LocalPublishAllAsync", LocalPublishAllAsync);
+            Connection.Closed += Connection_Closed;
+            Connection.Reconnected += Connection_Reconnected;
+            Connection.Reconnecting += Connection_Reconnecting;
+            _localSendAsyncConnection = Connection.On<MetaPacket>("LocalSendAsync", LocalSendAsync);
+            _localSendAllAsyncConnection = Connection.On<MetaPacket>("LocalSendAllAsync", LocalSendAllAsync);
+            _localPublishAsyncConnection = Connection.On<MetaPacket>("LocalPublishAsync", LocalPublishAsync);
+            _localPublishAllAsyncConnection = Connection.On<MetaPacket>("LocalPublishAllAsync", LocalPublishAllAsync);
 
         }
 
-        public bool? Active => connection?.State == HubConnectionState.Connected;
-        public HubConnectionState? State => connection?.State;
-        public HubConnectionInfo? ParentConnection { get; }
+        public bool? Active => Connection?.State == HubConnectionState.Connected;
+        public HubConnectionState? State => Connection?.State;
+        protected HubConnectionInfo? ParentConnection { get; }
         public bool IsRoot { get; }
 
-        public virtual async Task Start()
-        {
 
-            if (connection?.State != HubConnectionState.Disconnected)
-            {
-                throw new Exception("Already connected or connecting");
-            }
-            await connection.StartAsync();
-        }
-        public virtual async Task Stop()
-        {
-            if (connection == null) return;
-            await connection.StopAsync();
-        }
+        protected abstract Task Connection_Closed(Exception? arg);
 
-        protected virtual async Task Connection_Closed(Exception? arg)
-        {
-            
-        }
+        protected abstract   Task Connection_Reconnected(string? arg);
 
-        protected virtual async Task Connection_Reconnected(string? arg)
-        {
-        }
-
-        protected virtual async Task Connection_Reconnecting(Exception? arg)
-        {
-        }
+        protected abstract Task Connection_Reconnecting(Exception? arg);
     }
 }

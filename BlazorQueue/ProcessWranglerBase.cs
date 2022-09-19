@@ -13,7 +13,7 @@ namespace ClipHost
         private int? _maxInstances;
         protected readonly string ClipHuntaProcessPath;
 
-        public ProcessWranglerBase(IAppSettings appSettings)
+        protected ProcessWranglerBase(IAppSettings appSettings)
         {
             dtoProgramInstances = new List<T>();
             HostUrl = appSettings.Get<string>("ClipHuntaUrlSetting");
@@ -77,9 +77,9 @@ namespace ClipHost
             for (var i = dtoProgramInstances.Count - 1; i >= 0; i--)
             {
                 var dtoProgramInstance = dtoProgramInstances[i];
-                if (!dtoProgramInstance.Process().HasExited) continue;
+                if (!dtoProgramInstance.ProcessExited()) continue;
                 dtoProgramInstances.RemoveAt(i);
-                dtoProgramInstance.Process().Dispose();
+                dtoProgramInstance.ProcessDispose();
             }
         }
 

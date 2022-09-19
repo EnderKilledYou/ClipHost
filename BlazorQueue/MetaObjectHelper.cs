@@ -1,7 +1,7 @@
 ﻿
-using BlazorQueue;
 using System.Text.Json;
 
+namespace BlazorQueue;
 public static class MetaObjectHelper
 {
 

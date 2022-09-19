@@ -1,0 +1,17 @@
+﻿using System.Diagnostics;
+
+namespace BlazorQueue;
+
+public interface IProgramInstance
+{
+    bool IsConnected();
+    void IsConnected(bool value);
+    string ConnectionId();
+    void ConnectionId(string value);
+    Process? Process();
+    void ProcessDispose();
+    bool ProcessExited();
+    int ProcessId();
+    IProgramInstance Process(Process process);
+    ProgramInstanceReport ToReport();
+}

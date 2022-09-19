@@ -8,18 +8,19 @@ using System.Linq;
 
 namespace ClipHost;
 
-public class DtoProgramInstance : ProgramInstance
+public class DtoProgramInstance : ProgramInstance, IDtoProgramInstance
 {
     public int? DtoId { get; set; }
-    [JsonIgnore]
-    public ConcurrentDictionary<int, QueueReport> Reports { get; } = new();
 
-    public QueueReport[] ReportsArray => Reports.Values.ToArray();
+    private readonly ConcurrentDictionary<int, QueueReport> Reports = new();
+
+ 
+    public override QueueReport[] ReportsArray => Reports.Values.ToArray();
     public override DToProgramInstanceReport ToReport()
     {
         return new DToProgramInstanceReport(ConnectionId(), Process()?.Id ?? 0, ReportsArray);
     }
-    public void UpdateReport(QueueReport report)
+    public override void UpdateReport(QueueReport report)
     {
         if (!Reports.ContainsKey(report.Id))
         {

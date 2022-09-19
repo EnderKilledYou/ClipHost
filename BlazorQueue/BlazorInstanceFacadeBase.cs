@@ -10,14 +10,14 @@ namespace BlazorQueue
 {
     public abstract class BlazorInstanceFacadeBase 
     {
-        protected readonly MethodInfo? mi;
-        protected readonly MethodInfo? puba;
+        protected readonly MethodInfo? Mi;
+        protected readonly MethodInfo? Puba;
        
         public BlazorInstanceFacadeBase( ) 
         {
       
-            mi = typeof(InProcessServiceGateway).GetMethod("SendAllAsync");
-            puba = typeof(InProcessServiceGateway).GetMethod("PublishAllAsync");
+            Mi = typeof(InProcessServiceGateway).GetMethod("SendAllAsync");
+            Puba = typeof(InProcessServiceGateway).GetMethod("PublishAllAsync");
 
         }
 

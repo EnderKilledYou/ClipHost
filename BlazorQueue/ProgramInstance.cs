@@ -1,21 +1,10 @@
 ﻿using System.Diagnostics;
 using BlazorQueue;
+using ServiceStack.DataAnnotations;
 
-namespace ClipHost
+namespace BlazorQueue
 {
-    public interface IProgramInstance
-    {
-        bool IsConnected();
-        void IsConnected(bool value);
-        string ConnectionId();
-        void ConnectionId(string value);
-        Process Process();
-        int ProcessId();
-        IProgramInstance Process(Process process);
-        ProgramInstanceReport ToReport();
-    }
-
-    public abstract class ProgramInstance : IHaveBlazorConnection, IProgramInstance
+    public abstract class ProgramInstance : IHaveBlazorConnection, IProgramInstance, IReportInstance
     {
         public ProgramInstance()
         {
@@ -34,9 +23,21 @@ namespace ClipHost
             return _process;
         }
 
+        public void ProcessDispose()
+        {
+            _process?.Dispose();
+        }
+
+        public bool ProcessExited()
+        {
+            return _process is { HasExited: true };
+        }
+
         private string _connectionId;
         private bool _isConnected;
         private Process? _process;
+
+        public abstract QueueReport[] ReportsArray { get; }
 
         public bool IsConnected()
         {
@@ -65,5 +66,7 @@ namespace ClipHost
         {
             return Process()?.Id ?? 0;
         }
+
+        public abstract void UpdateReport(QueueReport report);
     }
 }

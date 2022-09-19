@@ -7,21 +7,21 @@ namespace BlazorQueue
 {
     public class BlazorInstanceTransmitter : BlazorInstanceFacadeBase
     {
-        protected readonly HubConnection? connection;
+        protected HubConnection? Connection;
         public BlazorInstanceTransmitter(HubConnectionInfo? parentConnectionInfo, bool isRoot = false)
         {
             if (parentConnectionInfo == null) return;
             Uri url = new Uri(parentConnectionInfo.HostUrl + parentConnectionInfo.HubName);
-            connection = new HubConnectionBuilder()
+            Connection = new HubConnectionBuilder()
                          .WithUrl(url, options =>
                          {
                              options.AccessTokenProvider = parentConnectionInfo.AccessTokenProvider;
                          }) 
                     .WithAutomaticReconnect(new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(1) })
                 .Build();
-            connection.Closed += Connection_Closed;
-            connection.Reconnected += Connection_Reconnected;
-            connection.Reconnecting += Connection_Reconnecting;
+            Connection.Closed += Connection_Closed;
+            Connection.Reconnected += Connection_Reconnected;
+            Connection.Reconnecting += Connection_Reconnecting;
         }
 
         private async Task Connection_Reconnecting(Exception? arg)
@@ -41,15 +41,15 @@ namespace BlazorQueue
 
         public async Task Start()
         {
-            if (connection == null) return;
-            await connection.StartAsync();
-            await connection!.SendAsync("Register", Environment.ProcessId);
+            if (Connection == null) return;
+            await Connection.StartAsync();
+            await Connection!.SendAsync("Register", Environment.ProcessId);
         }
 
         public async Task Stop()
         {
-            if (connection == null) return;
-            await connection.StopAsync();
+            if (Connection == null) return;
+            await Connection.StopAsync();
             
         }
 
@@ -64,8 +64,8 @@ namespace BlazorQueue
         /// <returns>Task</returns>
         public async Task PublishAllAsync<TResponse, R>(IEnumerable<R> requestDtos, CancellationToken token = default) where R : IReturn<TResponse>
         {
-            if (connection == null) return;
-            await connection.InvokeAsync<IEnumerable<TResponse>>("PublishAllAsync", requestDtos.ToMetaPacket<TResponse, R[]>(), token);
+            if (Connection == null) return;
+            await Connection.InvokeAsync<IEnumerable<TResponse>>("PublishAllAsync", requestDtos.ToMetaPacket<TResponse, R[]>(), token);
         }
 
         /// <summary>
@@ -78,14 +78,14 @@ namespace BlazorQueue
         /// <returns>Task</returns>
         public async Task PublishAsync<TResponse, R>(object requestDto, CancellationToken token = default) where R : IReturn<TResponse>
         {
-            if (connection == null) return;
-            await connection.InvokeAsync<IEnumerable<TResponse>>("PublishAsync", requestDto.ToMetaPacket<TResponse, R>(), token);
+            if (Connection == null) return;
+            await Connection.InvokeAsync<IEnumerable<TResponse>>("PublishAsync", requestDto.ToMetaPacket<TResponse, R>(), token);
         }
 
         public async Task<IEnumerable<TResponse>?> SendAllAsync<TResponse, R>(IEnumerable<R> requestDtos, CancellationToken token = default) where R : IReturn<TResponse>
         {
-            if (connection == null) return default;
-            return await connection.InvokeAsync<IEnumerable<TResponse>>("SendAllAsync", requestDtos.ToMetaPacket<TResponse, R[]>(), token);
+            if (Connection == null) return default;
+            return await Connection.InvokeAsync<IEnumerable<TResponse>>("SendAllAsync", requestDtos.ToMetaPacket<TResponse, R[]>(), token);
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace BlazorQueue
         /// <returns>Task of TResponse</returns>
         public async Task<TResponse?> SendAsync<TResponse, R>(object requestDto, CancellationToken token = default) where R : IReturn<TResponse>
         {
-            if (connection == null) return default;
-            return await connection.InvokeAsync<TResponse>("SendAsync", requestDto.ToMetaPacket<TResponse, R>(), token);
+            if (Connection == null) return default;
+            return await Connection.InvokeAsync<TResponse>("SendAsync", requestDto.ToMetaPacket<TResponse, R>(), token);
         }
     }
 }
