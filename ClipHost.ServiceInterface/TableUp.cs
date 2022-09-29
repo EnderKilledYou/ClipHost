@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using ClipHost.ServiceModel;
+using ClipHost.ServiceModel.Types;
 using ServiceStack.OrmLite;
 
 namespace ClipHost.ServiceInterface;

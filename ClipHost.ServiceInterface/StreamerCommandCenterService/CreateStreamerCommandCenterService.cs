@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ClipHost.ServiceModel.CreateStreamerCommandCenterModels;
+using ClipHost.ServiceModel.Types;
 using ServiceStack;
 using ServiceStack.OrmLite;
 
@@ -17,21 +18,17 @@ public class CreateStreamerCommandCenter : Service
 
     public async Task<CreateStreamerCommandCenterResponse> Post(CreateStreamerCommandCenterRequest request)
     {
-        try
+
+        request.StreamerCommandCenter.CommandCenterId = commandCenter.Id;
+        var exists = Db.Single<StreamerCommandCenter>(a => a.CommandCenterId == commandCenter.Id && a.StreamerId == request.StreamerCommandCenter.StreamerId);
+        if (exists == null)
         {
-            request.StreamerCommandCenter.CommandCenterId = commandCenter.Id;
             var id = Db.Insert(request.StreamerCommandCenter, true);
             return
                 new CreateStreamerCommandCenterResponse { Id = id };
         }
-        catch (Exception e)
-        {
-            return new CreateStreamerCommandCenterResponse
-            {
-                Success = false,
+        throw new ArgumentException("That fucking thing already exists, asshole");
 
-                Message = e.Message
-            };
-        }
+
     }
 }

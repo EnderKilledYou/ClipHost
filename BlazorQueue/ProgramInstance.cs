@@ -30,12 +30,13 @@ namespace BlazorQueue
 
         public bool ProcessExited()
         {
-            return _process is { HasExited: true };
+            return _process.HasExited;
         }
 
         private string _connectionId;
         private bool _isConnected;
         private Process? _process;
+        private   int? remoteProcessId;
 
         public abstract QueueReport[] ReportsArray { get; }
 
@@ -68,5 +69,15 @@ namespace BlazorQueue
         }
 
         public abstract void UpdateReport(QueueReport report);
+
+        public void RemoteProcessId(int processId)
+        {
+            remoteProcessId = processId;
+        }
+
+        public int? RemoteProcessId()
+        {
+            return remoteProcessId;
+        }
     }
 }

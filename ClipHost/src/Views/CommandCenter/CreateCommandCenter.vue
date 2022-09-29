@@ -4,7 +4,7 @@
             <h4>Create CommandCenterMask</h4>
             <b-alert :show="true" v-if="DataModel.Message.length >0">{{  DataModel.Message }}</b-alert>
             <b-form-group id="fieldset-Name" description="" label="Name" label-for="input-Name" valid-feedback=""><b-form-input id="fieldset-Name" :disabled="false" v-model="DataModel.Name" type="text" :trim="true"></b-form-input></b-form-group>
-             <b-form-group id="fieldset-MaxStreamers" description="" label="MaxStreamers" label-for="input-MaxStreamers" valid-feedback=""><b-form-input id="fieldset-MaxStreamers" :disabled="false" v-model="DataModel.MaxStreamers" type="number" :trim="true"></b-form-input></b-form-group>
+            <b-form-group id="fieldset-MaxStreamers" description="" label="MaxStreamers" label-for="input-MaxStreamers" valid-feedback=""><b-form-input id="fieldset-MaxStreamers" :disabled="false" v-model="DataModel.MaxStreamers" type="number" :trim="true"></b-form-input></b-form-group>
             <b-button @click="CreateCommandCenter(DataModel)">Create</b-button>
         </div>
     </section>
@@ -12,8 +12,8 @@
 <script lang="ts">
     console.log("");
     import { client } from '@/shared';
-import { CommandCenter, CreateCommandCenterRequest, CreateCommandCenterResponse } from '@/shared/dtos';
-import { Component, Mixins, Vue } from 'vue-property-decorator';
+    import { CommandCenter, CreateCommandCenterRequest, CreateCommandCenterResponse } from '@/shared/dtos';
+    import { Component, Mixins, Vue } from 'vue-property-decorator';
 
     export class CommandCenterCreateMask extends CommandCenter {
 

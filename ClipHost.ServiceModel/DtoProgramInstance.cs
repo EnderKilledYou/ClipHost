@@ -16,6 +16,9 @@ public class DtoProgramInstance : ProgramInstance, IDtoProgramInstance
 
  
     public override QueueReport[] ReportsArray => Reports.Values.ToArray();
+
+    public int DatabaseId { get; set; }
+
     public override DToProgramInstanceReport ToReport()
     {
         return new DToProgramInstanceReport(ConnectionId(), Process()?.Id ?? 0, ReportsArray);

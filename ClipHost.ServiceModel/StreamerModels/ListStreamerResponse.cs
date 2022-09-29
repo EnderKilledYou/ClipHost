@@ -1,26 +1,27 @@
 using System;
 using System.Collections.Generic;
+using ClipHost.ServiceModel.Types;
 
-                    namespace ClipHost.ServiceModel.ListStreamerModels {
-
-                                 
-                                 public class ListStreamerResponse  {
-                                    
-                                
-                                public long Count  {  get;  set; }  
+namespace ClipHost.ServiceModel.ListStreamerModels
+{
+    public class ListStreamerResponse
+    {
 
 
-                                
-                                public string Message  {  get;  set; }  = "" ;
+        public long Count { get; set; }
 
 
-                                
-                                public bool Success  {  get;  set; }  = true ;
+
+        public string Message { get; set; } = "";
 
 
-                                
-                                public List<Streamer> Streamers  {  get;  set; }  
 
-                                    
-                    }
+        public bool Success { get; set; } = true;
+
+
+
+        public List<Streamer> Streamers { get; set; }
+
+
+    }
 }

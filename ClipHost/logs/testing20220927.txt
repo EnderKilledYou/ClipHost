@@ -1,0 +1,4 @@
+2022-09-27 10:12:20.182 -05:00 [INF] Process exited for https://twitch.tv/bestboyfriend4
+2022-09-27 10:12:20.404 -05:00 [DBG] Failed to get the stream url bestboyfriend4 
+2022-09-27 10:20:16.296 -05:00 [INF] Process exited for https://twitch.tv/bestboyfriend4
+2022-09-27 10:20:16.421 -05:00 [DBG] Failed to get the stream url bestboyfriend4 

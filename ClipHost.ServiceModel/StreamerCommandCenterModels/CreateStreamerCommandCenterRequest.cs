@@ -1,6 +1,6 @@
 using System;
 using ServiceStack;
-using ClipHost.ServiceModel;
+using ClipHost.ServiceModel.Types;
 
 namespace ClipHost.ServiceModel.CreateStreamerCommandCenterModels
 {

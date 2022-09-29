@@ -2,18 +2,18 @@ using System;
 using ServiceStack;
 using ClipHost.ServiceModel;
 
-                    namespace ClipHost.ServiceModel.ListStreamerModels {
-
-                                 
-                                 public class ListStreamerRequest : IReturn<ListStreamerResponse> {
-                                    
-                                
-                                public int After  {  get;  set; }  
+namespace ClipHost.ServiceModel.ListStreamerModels
+{
+    public class ListStreamerRequest : IReturn<ListStreamerResponse>
+    {
 
 
-                                
-                                public String Name  {  get;  set; }  
+        public int After { get; set; }
 
-                                    
-                    }
+
+
+        public String Name { get; set; }
+
+
+    }
 }

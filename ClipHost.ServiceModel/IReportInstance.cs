@@ -1,5 +1,6 @@
 ﻿using ClipHost.ServiceModel;
 using System.Collections.Concurrent;
+using BlazorQueue;
 
 namespace ClipHost
 {

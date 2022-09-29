@@ -24,7 +24,7 @@
                         <b-button-group>
                             <b-button @click="Edit(a)">Edit</b-button>
                             <b-button @click="Delete(a)">Delete</b-button>
-                         
+
                         </b-button-group>
                         <b-td>{{ a.Id }}</b-td>
                         <b-td>{{ a.Name }}</b-td>
@@ -39,11 +39,11 @@
     import { Component, Vue } from 'vue-property-decorator'
     import { Mixins } from 'vue-property-decorator'
     import StreamerCommandCenterApiMixin, { StreamerCommandCenterCreateMask } from '../StreamerCommandCenter/StreamerCommandCenter'
-    import {  Streamer } from '@/shared/dtos'
+    import { DeleteStreamerRequest, Streamer } from '@/shared/dtos'
     import StreamerApiMixin, { StreamerListMask } from './ListStreamerMix'
 
 
-
+    import { client } from '@/shared'
 
 
 
@@ -81,7 +81,7 @@
 
 
 
-     
+
         async Previous() {
 
             this.LoadStreamer()
@@ -106,9 +106,22 @@
 
 
 
-        async Delete() {
+        async Delete(a: StreamerListMask) {
 
-            this.$router.push('DeleteStreamer')
+            try {
+                this.ApiCallMessage = ""
+                const deleteResponse = await client.delete(new DeleteStreamerRequest({
+                    Id: a.Id
+                }));
+                this.ApiCallMessage = "Deleted";
+                await this.LoadStreamer()
+            } catch (e: any) {
+                this.ApiCallMessage = e.message;
+
+                this.ApiCallSuccess = false;
+
+            }
+
 
         }
 

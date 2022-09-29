@@ -25,7 +25,7 @@ namespace ClipHost.ServiceModel.ListQueueReportService
             _clipProcessWrangler = clipProcessWrangler;
         }
 
-        public async Task<ListQueueReportResponse> Get(ListQueueReportRequest request)
+        public async Task<ListQueueReportResponse> Post(ListQueueReportRequest request)
         {
 
             try

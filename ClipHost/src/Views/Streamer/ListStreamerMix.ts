@@ -21,7 +21,7 @@ export default class StreamerApiMixin extends Vue {
     async ListStreamer(DataModel: StreamerListMask[], After: number, Name: string) {
 
         try {
-        
+
             const Response: ListStreamerResponse = await client.get(new ListStreamerRequest({
                 After: After,
                 Name: Name

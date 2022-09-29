@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ClipHost.ServiceModel.ListStreamerModels;
+using ClipHost.ServiceModel.Types;
 using ServiceStack;
 using ServiceStack.OrmLite;
 
@@ -21,14 +22,14 @@ public class ListStreamer : Service
 
             return
                 new ListStreamerResponse
-                    { Streamers = data, Success = true, Message = "" }
+                { Streamers = data, Success = true, Message = "" }
                 ;
         }
         catch (Exception e)
         {
             return
                 new ListStreamerResponse
-                    { Success = false, Message = e.Message }
+                { Success = false, Message = e.Message }
                 ;
         }
     }

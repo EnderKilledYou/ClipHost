@@ -3,22 +3,27 @@ using ServiceStack.Configuration;
 using ServiceStack.Data;
 using System.Diagnostics;
 using BlazorQueue;
+using ServiceStack;
 
 namespace ClipHost
 {
     public class ProcessWranglerBase<T> : BackgroundService, IAcceptConnections where T : IProgramInstance, new()
     {
         protected readonly List<T> dtoProgramInstances;
+        protected readonly List<T> remoteDtoProgramInstances;
         protected readonly string HostUrl;
-        private int? _maxInstances;
+        protected int? _maxInstances;
         protected readonly string ClipHuntaProcessPath;
+        protected readonly IAppSettings settings;
 
-        protected ProcessWranglerBase(IAppSettings appSettings)
+        protected ProcessWranglerBase(IAppSettings appSettings, int maxProcesses)
         {
             dtoProgramInstances = new List<T>();
+            remoteDtoProgramInstances = new List<T>();
             HostUrl = appSettings.Get<string>("ClipHuntaUrlSetting");
-            _maxInstances = appSettings.Get<int>("ClipHuntaMaxInstances");
+            _maxInstances = maxProcesses;
             ClipHuntaProcessPath = appSettings.Get<string>("ClipHuntaProcessPath");
+            settings = appSettings;
         }
 
         /// <summary>
@@ -29,7 +34,14 @@ namespace ClipHost
         {
             return dtoProgramInstances.Count(b => !string.IsNullOrEmpty(b.ConnectionId()));
         }
-
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <returns>The amount of available slots</returns>
+        public virtual int CountRemote()
+        {
+            return remoteDtoProgramInstances.Count(b => !string.IsNullOrEmpty(b.ConnectionId()));
+        }
         /// <summary>
         /// Set max instances
         /// </summary>
@@ -63,6 +75,21 @@ namespace ClipHost
             instance.IsConnected(true);
         }
 
+        public void AddRemoteConnectionId(string connectionId, int processId)
+        {
+            var instance = remoteDtoProgramInstances.FirstOrDefault(a => a.RemoteProcessId() == processId);
+            if (instance != null)
+            {
+                throw new ArgumentException("process already exists");
+            }
+            instance = new T();
+
+            instance.RemoteProcessId(processId);
+            instance.ConnectionId(connectionId);
+            instance.IsConnected(true);
+            remoteDtoProgramInstances.Add(instance);
+        }
+
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -92,15 +119,15 @@ namespace ClipHost
             items.AddRange(dtoProgramInstances.Select(item => item.ToReport()));
         }
 
-        protected virtual bool StartProgram()
+        protected virtual T? StartProgram()
         {
             var p = ProcessHelper.StartProcess(ClipHuntaProcessPath, HostUrl);
-            if (p == null) return false;
-            if (!p.Start()) return false;
+            if (p == null) return default;
+            if (!p.Start()) return default;
             var programInstance = new T();
             programInstance.Process(p);
             dtoProgramInstances.Add(programInstance);
-            return true;
+            return programInstance;
             //todo: when it doesn't start or otherwise. could burdened surver
             //todo: when it doesn't start or otherwise. could burdened surver
         }

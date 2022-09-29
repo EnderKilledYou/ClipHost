@@ -9,6 +9,8 @@ public interface IProgramInstance
     string ConnectionId();
     void ConnectionId(string value);
     Process? Process();
+    void RemoteProcessId(int processId);
+    int? RemoteProcessId();
     void ProcessDispose();
     bool ProcessExited();
     int ProcessId();

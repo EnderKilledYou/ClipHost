@@ -1,3 +1,4 @@
+using ClipHost.ServiceModel.Types;
 using ServiceStack;
 
 namespace ClipHost.ServiceModel.CreateCommandCenterModels

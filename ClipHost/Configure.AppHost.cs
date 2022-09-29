@@ -28,8 +28,8 @@ public partial class AppHost : AppHostBase, IHostingStartup
         });
 
     public AppHost() : base("ClipHost", typeof(MyServices).Assembly) { }
-    
-    
+
+ 
     public override void Configure(Container container)
     {
 
@@ -58,7 +58,7 @@ public partial class AppHost : AppHostBase, IHostingStartup
             LimitToAuthenticatedUsers = false,
         });
         JsConfig.TextCase = TextCase.PascalCase;
- 
+
         container.AddSingleton<TagMangager>();
         var sef = new ServerEventsFeature
         {
@@ -73,9 +73,9 @@ public partial class AppHost : AppHostBase, IHostingStartup
             }
         };
         Plugins.Add(sef);
-  
-   
-   
+
+
+
 
 
 

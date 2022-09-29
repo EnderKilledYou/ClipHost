@@ -1,9 +1,13 @@
-﻿using ServiceStack.Auth;
+﻿using ClipHost.ServiceModel;
+using ServiceStack.Auth;
 using ServiceStack.Configuration;
 using ServiceStack.Text;
 using TwitchLib.Api;
 using TwitchLib.Api.Core;
+using TwitchLib.Api.Core.Interfaces;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
+using static ServiceStack.OrmLite.Dapper.SqlMapper;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ClipHost;
 
@@ -11,7 +15,7 @@ public class TwitchOauthProvider : OAuth2Provider
 {
     public const string Name = "twitch";
     public static string Realm = "https://id.twitch.tv/";
-
+    private IAppSettings settings;
 
     public bool RetrieveEmail { get; set; } = true;
 
@@ -28,6 +32,7 @@ public class TwitchOauthProvider : OAuth2Provider
         RequestTokenUrl = "https://id.twitch.tv/oauth2/auth";
         CallbackUrl = appSettings.Get<string>("Twitch:CallBack");
         ConsumerKey = appSettings.Get<string>("Twitch:Id");
+        settings = appSettings;
         Scopes = appSettings.Get<string[]>("Twitch:Scopes");
         ConsumerSecret = appSettings.Get<string>("Twitch:Secret");
 
@@ -52,6 +57,8 @@ public class TwitchOauthProvider : OAuth2Provider
         };
     }
 
+
+
     protected override async Task LoadUserAuthInfoAsync(AuthUserSession user, IAuthTokens tokens,
         Dictionary<string, string> authInfo, CancellationToken token = default)
     {
@@ -72,9 +79,10 @@ public class TwitchOauthProvider : OAuth2Provider
         tokens.DisplayName = json.DisplayName;
         tokens.UserName = json.Login;
         tokens.UserId = json.Login;
-        tokens.Email = json.Email?? json.Login + "@twitch.tv";
+        tokens.Email = json.Email ?? json.Login + "@twitch.tv";
         tokens.Items[AuthMetadataProvider.ProfileUrlKey] = json.ProfileImageUrl.SanitizeOAuthUrl();
-
+        tokens.RefreshToken = tokens.Items["refresh_token"];
+        tokens.RefreshTokenExpiry = DateTime.Now.AddSeconds(int.Parse(tokens.Items["expires_in"]));
 
         userSession.UserAuthName = tokens.Email ?? json.Login;
 
@@ -114,28 +122,5 @@ public class TwitchOauthProvider : OAuth2Provider
         }
     }
 
-    static async Task<AuthId?> VerifyTwitchAccessTokenAsync(string consumerKey,
-        string consumerSecret, string accessToken, string accessTokenSecret, CancellationToken token = default)
-    {
-        var api = new TwitchAPI(settings: new ApiSettings()
-        {
-            AccessToken = accessToken,
-            ClientId = consumerKey,
-            Secret = consumerSecret,
-        });
-        try
-        {
-            var usr = await api.Helix.Users.GetUsersAsync();
-            if (usr == null) return null;
-            return new AuthId()
-            {
-                Email = usr.Users[0].Login + "@twitch.tv",
-                UserId = usr.Users[0].Login
-            };
-        }
-        catch (Exception ex)
-        {
-            return null;
-        }
-    }
+
 }

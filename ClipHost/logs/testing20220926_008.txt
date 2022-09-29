@@ -1,0 +1,4 @@
+2022-09-26 21:26:59.770 -05:00 [INF] Process exited for https://twitch.tv/something
+2022-09-26 21:26:59.960 -05:00 [DBG] Failed to get the stream url something 
+2022-09-26 21:28:05.577 -05:00 [INF] Process exited for https://twitch.tv/something
+2022-09-26 21:28:05.885 -05:00 [DBG] Failed to get the stream url something 

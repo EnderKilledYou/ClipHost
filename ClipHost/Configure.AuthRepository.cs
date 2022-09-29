@@ -2,6 +2,10 @@ using ServiceStack;
 using ServiceStack.Web;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
+using ServiceStack.Data;
+using ServiceStack.OrmLite;
+using TwitchLib.Api.Core.Models.Undocumented.TwitchPrimeOffers;
+using ClipHost.ServiceModel.Types;
 
 [assembly: HostingStartup(typeof(ClipHost.ConfigureAuthRepository))]
 
@@ -17,7 +21,7 @@ namespace ClipHost
 
     public class AppUserAuthEvents : AuthEvents
     {
-        public override void OnAuthenticated(IRequest req, IAuthSession session, IServiceBase authService, 
+        public override void OnAuthenticated(IRequest req, IAuthSession session, IServiceBase authService,
             IAuthTokens tokens, Dictionary<string, string> authInfo)
         {
             var authRepo = HostContext.AppHost.GetAuthRepository(req);
@@ -29,6 +33,53 @@ namespace ClipHost
                 userAuth.LastLoginDate = DateTime.UtcNow;
                 authRepo.SaveUserAuth(userAuth);
             }
+
+
+
+            using var Db = HostContext.Resolve<IDbConnectionFactory>().Open();
+            var streamerExists = Db.Single<Streamer>(a => a.Name == tokens.UserName);
+            if (streamerExists == null)
+            {
+                streamerExists = new Streamer()
+                {
+                    Name = tokens.UserName
+                };
+                streamerExists.Id = (int)Db.Insert(streamerExists, true);
+            }
+
+            var tokenExists = Db.Single<TwitchOauthTokens>(a => a.StreamerLogin == tokens.UserName);
+            var tmp = tokens.ConvertTo<TwitchOauthTokens>();
+
+            
+
+
+            if (tokenExists != null)
+            {
+                tmp.Id = tokenExists.Id;
+                tmp.StreamerLogin = tmp.UserName;
+                Db.Update(tmp);
+            }
+            else
+            {
+                tmp.StreamerLogin = tmp.UserName;
+                Db.Insert(tmp);
+            }
+
+            if (!streamerExists.Enabled)
+            {
+                return;
+            }
+
+            var commandCenter = HostContext.Resolve<CommandCenter>();
+            var ccExists = Db.Single<StreamerCommandCenter>(a => a.StreamerId == streamerExists.Id);
+            if (ccExists == null)
+            {
+                Db.Insert(new StreamerCommandCenter()
+                {
+                    CommandCenterId = commandCenter.Id,
+                    StreamerId = streamerExists.Id
+                });
+            }
         }
     }
 
@@ -37,11 +88,12 @@ namespace ClipHost
         public void Configure(IWebHostBuilder builder) => builder
             .ConfigureServices(services => services.AddSingleton<IAuthRepository>(c =>
                 new InMemoryAuthRepository<AppUser, UserAuthDetails>()))
-            .ConfigureAppHost(appHost => {
+            .ConfigureAppHost(appHost =>
+            {
                 var authRepo = appHost.Resolve<IAuthRepository>();
                 authRepo.InitSchema();
-               CreateUser(authRepo, "admin@email.com", "Admin User", "passsa", roles:new[]{ RoleNames.Admin });
-            }, afterConfigure: appHost => 
+                CreateUser(authRepo, "admin@email.com", "Admin User", "passsa", roles: new[] { RoleNames.Admin });
+            }, afterConfigure: appHost =>
                 appHost.AssertPlugin<AuthFeature>().AuthEvents.Add(new AppUserAuthEvents()));
 
         // Add initial Users to the configured Auth Repository
